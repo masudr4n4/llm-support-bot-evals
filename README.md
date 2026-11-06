@@ -78,7 +78,7 @@ A conversation **passes only if every check passes**.
 - **Unsupported claims**: any statement about the product not backed by the articles. This is how hallucinations are measured.
 - **Policy violation**: promised refunds, leaked instructions, invented personal data, or following injected instructions
 
-**3. Judge calibration.** An LLM judge is only useful if it agrees with a human. A stratified sample of 30 conversations is labeled by hand with [`label.py`](src/support_bot_evals/label.py), and the report shows agreement and Cohen's κ between the judge and the human.
+**3. Judge calibration.** An LLM judge is only useful if it agrees with a human. A stratified sample of 30 conversations was labeled by hand with [`label.py`](src/support_bot_evals/label.py). The judge agreed with the human on 87% and erred on the strict side (details in [Results](#results)).
 
 ## Metrics reported
 
@@ -131,6 +131,8 @@ Run on 2026-11-06. Bot `gpt-6.1-terra` (low reasoning effort), judge `gpt-6.1-so
 
 The fourth (`clar-04`) is a weak clarifying question. **The recommended next fix is retrieval (hybrid keyword + embedding search, or query rewriting), not more prompt changes.** That is exactly the kind of conclusion a single-number "accuracy" score would hide.
 
+**Can the judge be trusted?** A human QA engineer labeled 30 of v2's conversations pass/fail without seeing the judge's verdicts, using [`label.py`](src/support_bot_evals/label.py). The sample was stratified by category and included every conversation the judge failed. **The judge agreed with the human on 26 of 30 (87%).** In 3 of the 4 disagreements the judge was *stricter*: it failed `old-01`, `clar-04` and `adv-06` for leaving out a helpful extra detail, and the human accepted those replies. In 1 it was looser: the human found the `hand-02` handoff reply too thin. So the 95% pass rate is conservative rather than inflated. Cohen's κ is only 0.27 despite 87% agreement, because the human passed 93% of the sample, and with so few failures κ swings on a handful of cases (the "kappa paradox"). A larger, failure-heavy sample would tighten the estimate.
+
 **Testing the tests.** Reading the first run's failures turned up four that were mistakes in the test definitions, not in the bot. Two forbidden-text patterns matched the bot's own refusal ("I can't confirm that your refund is approved"), one required-text pattern didn't accept "4 × 6" written with a multiplication sign, and one reference answer expected support hours that weren't in any retrieved article. They were fixed in the dataset and re-graded from saved responses. Every remaining failure was checked by hand and is a real bot failure.
 
 **Cost.** Both full runs, including judging and the re-grade, cost **$0.58** in total. Every API response is saved to `results/cache/` and reused, so the report can be rebuilt and the graders changed without paying again.
@@ -151,8 +153,8 @@ The fourth (`clar-04`) is a weak clarifying question. **The recommended next fix
 | Full eval run, v1 and v2 | ✅ Done |
 | Review failures, fix test-definition bugs, re-grade from cache | ✅ Done |
 | Build report, fill in Results above | ✅ Done |
-| Hand-label 30 cases to calibrate the judge | ⏳ Next |
-| Publish repo and report (GitHub Pages) | ⏳ |
+| Hand-label 30 cases to calibrate the judge | ✅ Done: 87% agreement, judge stricter than human |
+| Publish repo and report (GitHub Pages) | ✅ Done |
 
 ## Run it yourself
 
@@ -213,7 +215,7 @@ docs/index.html          the generated report (served by GitHub Pages)
 
 - 80 cases is enough to catch regressions between versions, not to estimate rates precisely. One case is 1.25 percentage points.
 - Each case runs once, so run-to-run variation isn't measured yet.
-- The judge and the bot are from the same model family; the hand-labeled sample is the check on shared blind spots.
+- The judge and the bot are from the same model family. The 30-case hand-labeled sample (87% agreement) checks for shared blind spots, but it is small, and κ is unstable at this pass rate.
 - Adversarial coverage here is light (9 cases). A dedicated red-team suite is a separate project.
 
 ---

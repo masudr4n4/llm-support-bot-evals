@@ -98,9 +98,15 @@ def calibration(run: dict) -> dict | None:
     if not LABELS.exists():
         return None
     labels = json.loads(LABELS.read_text()).get(f"{run['prompt_version']}:{run['prompt_sha']}", {})
-    pairs = [(labels[c["id"]], c["judge"]["passed"]) for c in run["cases"] if c["id"] in labels and c["judge"]]
+    labeled = [c for c in run["cases"] if c["id"] in labels and c["judge"]]
+    pairs = [(labels[c["id"]], c["judge"]["passed"]) for c in labeled]
     if len(pairs) < 10:
         return None
+    disagreements = [
+        {"id": c["id"], "human": labels[c["id"]], "judge": c["judge"]["passed"], "reason": c["judge"]["reason"]}
+        for c in labeled
+        if labels[c["id"]] != c["judge"]["passed"]
+    ]
     n = len(pairs)
     agree = sum(h == j for h, j in pairs) / n
     p_h, p_j = sum(h for h, _ in pairs) / n, sum(j for _, j in pairs) / n
@@ -112,6 +118,8 @@ def calibration(run: dict) -> dict | None:
         "kappa": kappa,
         "judge_stricter": sum(h and not j for h, j in pairs),
         "judge_looser": sum(j and not h for h, j in pairs),
+        "human_pass_rate": p_h,
+        "disagreements": disagreements,
     }
 
 

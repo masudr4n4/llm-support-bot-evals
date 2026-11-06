@@ -162,6 +162,27 @@ a { color: var(--s1); }
   </div>
 </div>
 
+{% if calibration %}
+<h2 id="calibration">Can the judge be trusted?</h2>
+<p class="section-note">Every pass/fail above comes from an LLM judge, so it was checked against a human. A QA engineer labeled {{ calibration.n }} of prompt {{ current.prompt_version }}'s conversations pass/fail without seeing the judge's verdict. The sample was stratified by category and included every conversation the judge failed.</p>
+<div class="tiles" style="margin-top:0">
+  <div class="card tile"><div class="label">Judge agrees with human</div><div class="value">{{ pct(calibration.agreement) }}</div><div class="delta">{{ calibration.n - calibration.disagreements|length }} of {{ calibration.n }} conversations</div></div>
+  <div class="card tile"><div class="label">Judge stricter than human</div><div class="value">{{ calibration.judge_stricter }}</div><div class="delta">judge failed, human passed</div></div>
+  <div class="card tile"><div class="label">Judge looser than human</div><div class="value">{{ calibration.judge_looser }}</div><div class="delta">judge passed, human failed</div></div>
+  <div class="card tile"><div class="label">Cohen's κ</div><div class="value">{{ "%.2f"|format(calibration.kappa) }}</div><div class="delta">chance-corrected; see note</div></div>
+</div>
+<div class="card" style="margin-top:12px">
+  <h3>Where they disagreed</h3>
+  <div class="scroll"><table>
+    <tr><th>Case</th><th>Human</th><th>Judge</th><th>Judge's reasoning</th></tr>
+    {% for d in calibration.disagreements %}
+    <tr><td><code>{{ d.id }}</code></td><td>{{ '✓ pass' if d.human else '✕ fail' }}</td><td>{{ '✓ pass' if d.judge else '✕ fail' }}</td><td>{{ d.reason }}</td></tr>
+    {% endfor %}
+  </table></div>
+  <p class="ref">The judge errs on the strict side: it docked replies for missing a helpful extra detail that a human reviewer accepted. The pass rate in this report is therefore conservative. κ is low despite {{ pct(calibration.agreement) }} raw agreement because the human passed {{ pct(calibration.human_pass_rate) }} of the sample; when almost everything passes, κ is very sensitive to a handful of disagreements (the "kappa paradox"). The disagreement list is the more useful signal. A larger, more failure-heavy sample would tighten the estimate.</p>
+</div>
+{% endif %}
+
 {% macro case_card(c, version_class="") %}
 <div class="card case">
   <div class="case-head"><span class="id">{{ c.id }}</span><span class="cat">{{ category_labels[c.category] }}</span>
@@ -190,7 +211,7 @@ a { color: var(--s1); }
   <li><strong>Deterministic checks.</strong> Action, required facts (exact strings or regex), forbidden content, citations that exist, and the expected article cited.</li>
   <li><strong>LLM-as-judge.</strong> <code>{{ current.judge_model }}</code> scores correctness 1 to 5 against the reference, lists any claim about the product not supported by the articles the bot was given (hallucination), and flags policy violations. Pass = correctness ≥ 4, no unsupported claims, no violation.</li>
   <li><strong>Judge calibration.</strong>
-    {% if calibration %}On {{ calibration.n }} hand-labeled conversations the judge agreed with the human label {{ pct(calibration.agreement) }} of the time (Cohen's κ = {{ "%.2f"|format(calibration.kappa) }}). It was stricter than the human on {{ calibration.judge_stricter }} and looser on {{ calibration.judge_looser }}.
+    {% if calibration %}{{ calibration.n }} conversations were labeled pass/fail by a human QA engineer without seeing the judge's verdict; see <a href="#calibration">Can the judge be trusted?</a> above.
     {% else %}Pending: a stratified sample is being hand-labeled to measure how often the judge agrees with a human.{% endif %}</li>
   <li><strong>Release gate.</strong> <code>pytest</code> fails the build if pass rate &lt; 85%, action accuracy &lt; 90%, any required handoff is missed, hallucination rate &gt; 5%, or any policy violation occurs.</li>
   <li><strong>Limitations.</strong> {{ s.total }} cases is enough to catch regressions, not to estimate rates precisely (one case ≈ {{ "%.1f"|format(100 / s.total) }} points). The judge is a larger model from the same family as the bot (GPT-6.1), so shared blind spots are possible; the hand-labeled sample is the check on that. Each case ran once, so run-to-run variation isn't measured here.</li>
