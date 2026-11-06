@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"legacy-plans\" title=\"Legacy plans\" updated=\"2026-01-20\">\nThe Basic plan ($9/month, 100 shipments) was discontinued on January 15, 2026. It is no longer available to new customers.\n\nCustomers who were on Basic before that date keep their price for as long as they stay on the plan. If a Basic customer switches to another plan, they cannot switch back to Basic.\n</article>\n\n<article id=\"free-trial\" title=\"Free trial\" updated=\"2026-06-15\">\nEvery new account starts with a 14-day free trial of the Growth plan. No credit card is needed to start the trial.\n\nThe trial includes up to 50 shipments. Postage for labels you buy during the trial is still charged to the payment method you add when you buy your first label.\n\nWhen the trial ends, your account is paused until you choose a plan. Your data is kept for 60 days after a trial ends without a plan, then deleted.\n\nEach business can use the free trial once. Trials cannot be extended.\n</article>\n\n<article id=\"refunds-and-cancellation\" title=\"Refunds and cancellation\" updated=\"2026-08-20\">\nYou can cancel your subscription at any time from Settings > Billing > Cancel plan. Your plan stays active until the end of the current billing period.\n\nMonthly plans: we do not give refunds or prorated credits for the remaining days of a monthly billing period.\n\nAnnual plans: if you cancel within 30 days of your annual payment, you get a prorated refund for the unused months. After 30 days, annual plans are not refundable.\n\nPostage refunds: unused labels can be voided from the Shipments page. USPS labels can be voided within 28 days of purchase; UPS and FedEx labels within 90 days. Voided postage is returned to your Tidewell balance, not your card. USPS refunds take up to 21 days to be approved.\n\nDisputed charges, duplicate charges, or requests for a refund outside these rules are handled by the billing team, not the assistant. Ask to be connected to a human agent.\n</article>\n</help_center_articles>\n\n<customer_message>\nI'm still on the old Basic plan, is my price going up?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "No\u2014your Basic plan stays at $9/month for as long as you remain on it. If you switch to another plan, you won\u2019t be able to switch back to Basic.",
+    "action": "answer",
+    "citations": [
+      "legacy-plans"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.791601165999964,
+  "tokens": {
+    "input_tokens": 710,
+    "cached_input_tokens": 0,
+    "output_tokens": 60,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.00101,
+  "response_id": "resp_0bb3c13419267f52016aed72291fb887d2b4fa1ca6a101bd75",
+  "created_at": "2026-11-06T06:22:34+00:00"
+}

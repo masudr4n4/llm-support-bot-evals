@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"data-retention-privacy\" title=\"Data retention and privacy\" updated=\"2026-09-10\">\nShipment and order data is kept for 24 months, then deleted automatically. You can export your shipments as CSV at any time from Reports > Export.\n\nTo delete your account and all of its data, the account owner must ask a human agent. Deletion is completed within 30 days of the request and cannot be undone.\n\nA Data Processing Agreement (DPA) for GDPR is available on request for all plans.\n\nTidewell never sells your data or your customers' data.\n</article>\n\n<article id=\"api-and-webhooks\" title=\"API and webhooks\" updated=\"2026-08-28\">\nThe Tidewell REST API is available on the Growth and Scale plans. Create API keys in Settings > Developers.\n\nRate limits: 120 requests per minute on Growth, 600 requests per minute on Scale. Requests over the limit get an HTTP 429 response.\n\nWebhooks can notify your system about label created, tracking updated and delivered events. If your endpoint does not return a 2xx response, Tidewell retries up to 5 times over 24 hours.\n\nA sandbox environment for testing is available to all API users; sandbox labels are free and not valid for shipping.\n</article>\n\n<article id=\"account-security\" title=\"Account security and sign-in\" updated=\"2026-04-18\">\nTwo-factor authentication (2FA) can be turned on in Settings > Security using an authenticator app. SMS-based 2FA is not offered.\n\nSingle sign-on (SSO) with SAML is available on the Scale plan.\n\nPassword reset links expire after 1 hour. If the link has expired, request a new one from the sign-in page.\n\nIf you think someone else has accessed your account, change your password immediately and contact a human agent so the security team can review account activity. The assistant cannot review account activity.\n</article>\n</help_center_articles>\n\n<customer_message>\nPlease delete my account and all my data.\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "I\u2019ll route your request to a human agent. The account owner must request deletion. Once requested, deletion is completed within 30 days and cannot be undone.",
+    "action": "handoff",
+    "citations": [
+      "data-retention-privacy"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.84790512499967,
+  "tokens": {
+    "input_tokens": 663,
+    "cached_input_tokens": 0,
+    "output_tokens": 73,
+    "reasoning_tokens": 13
+  },
+  "cost_usd": 0.001028,
+  "response_id": "resp_0dc3cc094ee44850016aed721b7aa487d2a201b01fc61ccfce",
+  "created_at": "2026-11-06T06:22:21+00:00"
+}

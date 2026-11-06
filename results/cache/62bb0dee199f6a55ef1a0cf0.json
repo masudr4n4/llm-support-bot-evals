@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"api-and-webhooks\" title=\"API and webhooks\" updated=\"2026-08-28\">\nThe Tidewell REST API is available on the Growth and Scale plans. Create API keys in Settings > Developers.\n\nRate limits: 120 requests per minute on Growth, 600 requests per minute on Scale. Requests over the limit get an HTTP 429 response.\n\nWebhooks can notify your system about label created, tracking updated and delivered events. If your endpoint does not return a 2xx response, Tidewell retries up to 5 times over 24 hours.\n\nA sandbox environment for testing is available to all API users; sandbox labels are free and not valid for shipping.\n</article>\n</help_center_articles>\n\n<customer_message>\nIf my webhook endpoint is down, do I lose the events?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "Not immediately. If your webhook endpoint doesn't return a 2xx response, Tidewell retries the event up to 5 times over 24 hours. The article doesn't say what happens if all retries fail.",
+    "action": "answer",
+    "citations": [
+      "api-and-webhooks"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.8655552500003978,
+  "tokens": {
+    "input_tokens": 408,
+    "cached_input_tokens": 0,
+    "output_tokens": 65,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.000733,
+  "response_id": "resp_06290dd7b6d5cfc4016aed720f105487d2b7a06a3d18fb6e24",
+  "created_at": "2026-11-06T06:22:08+00:00"
+}

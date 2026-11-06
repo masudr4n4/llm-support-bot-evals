@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support Bot Eval Report</title>
+<meta name="description" content="Evaluation of a RAG customer support chatbot: {{ s.total }} test conversations, LLM-as-judge grading, prompt regression comparison.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+  --s1: #2a78d6; --s2: #eb6834;
+  --good: #006300; --good-bg: rgba(12,163,12,0.10); --bad: #b02a2a; --bad-bg: rgba(208,59,59,0.09);
+  --code: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926;
+    --good: #0ca30c; --good-bg: rgba(12,163,12,0.14); --bad: #e66767; --bad-bg: rgba(230,103,103,0.12);
+    --code: #262624;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+  --s1: #3987e5; --s2: #d95926;
+  --good: #0ca30c; --good-bg: rgba(12,163,12,0.14); --bad: #e66767; --bad-bg: rgba(230,103,103,0.12);
+  --code: #262624;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 40px 16px 80px; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+h2 { font-size: 20px; margin: 48px 0 6px; }
+h3 { font-size: 15px; margin: 0 0 6px; }
+p { margin: 0 0 12px; }
+.lede { color: var(--ink-2); max-width: 70ch; }
+.meta { color: var(--muted); font-size: 13px; }
+.section-note { color: var(--ink-2); margin-bottom: 16px; max-width: 72ch; }
+.card { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px 20px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 24px; }
+.tile .label { color: var(--ink-2); font-size: 13px; }
+.tile .value { font-size: 30px; font-weight: 600; line-height: 1.2; margin: 4px 0 2px; }
+.tile .delta { font-size: 13px; color: var(--ink-2); }
+.delta.up { color: var(--good); } .delta.down { color: var(--bad); }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--ink-2); margin-bottom: 10px; flex-wrap: wrap; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.chart { width: 100%; max-width: 820px; min-width: 560px; height: auto; display: block; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; }
+.chart .axis { stroke: var(--axis); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .cat { fill: var(--ink); font-size: 13px; }
+.chart .val { fill: var(--ink-2); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .s1 { fill: var(--s1); } .chart .s2 { fill: var(--s2); }
+.chart .hit { fill: transparent; }
+.chart .bar:hover path { opacity: 0.8; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--grid); }
+th { color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; }
+.cm td.cell { text-align: center; min-width: 64px; font-weight: 600; }
+.cm td.diag { outline: 2px solid var(--ink); outline-offset: -2px; }
+.cm td.light-text { color: #fcfcfb; } .cm td.dark-text { color: #0b0b0b; }
+details.table-view { margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+details.table-view summary { cursor: pointer; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; }
+.badge.pass { color: var(--good); background: var(--good-bg); } .badge.fail { color: var(--bad); background: var(--bad-bg); }
+.case { margin-bottom: 14px; }
+.case-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 10px; }
+.case-head .id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 600; }
+.case-head .cat { color: var(--muted); font-size: 13px; }
+.turn { margin: 0 0 8px; padding: 8px 12px; border-radius: 8px; background: var(--code); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.turn .who { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; }
+.turn.bot { border-left: 3px solid var(--s1); }
+.turn.bot.v1 { border-left-color: var(--s2); }
+.findings { margin: 10px 0 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+.findings li { margin-bottom: 2px; overflow-wrap: anywhere; }
+.ref { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } h1 { font-size: 24px; } .tile .value { font-size: 26px; } }
+ul.plain { padding-left: 18px; } ul.plain li { margin-bottom: 6px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; background: var(--code); padding: 1px 5px; border-radius: 4px; }
+footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
+a { color: var(--s1); }
+</style>
+</head>
+<body>
+<main>
+{% macro pct(v) %}{{ "%.0f"|format(v * 100) }}%{% endmacro %}
+{% macro delta(cur, base, higher_is_better=True, fmt="pts") -%}
+  {%- set d = cur - base -%}
+  {%- set good = (d > 0) if higher_is_better else (d < 0) -%}
+  {%- if fmt == "pts" -%}
+    {%- set text = ("%+.0f"|format(d * 100)) ~ " pts vs " ~ baseline.prompt_version -%}
+  {%- else -%}
+    {%- set text = ("%+.1f"|format(d)) ~ "s vs " ~ baseline.prompt_version -%}
+  {%- endif -%}
+  <div class="delta {% if d|abs > 0.005 %}{{ 'up' if good else 'down' }}{% endif %}">{% if d|abs > 0.005 %}{{ '▲' if d > 0 else '▼' }} {% endif %}{{ text }}</div>
+{%- endmacro %}
+
+<p class="meta">LLM evaluation · RAG support chatbot</p>
+<h1>Support chatbot evaluation report</h1>
+<p class="lede">An automated test suite for a retrieval-augmented customer support assistant. {{ s.total }} scripted conversations check whether it answers correctly from its help center, admits when it doesn't know, hands off to a human when it should, and resists prompt injection. Two versions of the system prompt are compared to show what changed.</p>
+<p class="meta">Tidewell is a fictional shipping software company with a {{ 15 }}-article help center written for this project. Bot: <code>{{ current.bot_model }}</code> · Judge: <code>{{ current.judge_model }}</code> · Run {{ current.run_at[:10] }} · Prompt {{ current.prompt_version }} <code>{{ current.prompt_sha }}</code></p>
+
+<div class="tiles">
+  <div class="card tile"><div class="label">Pass rate (prompt {{ current.prompt_version }})</div><div class="value">{{ pct(s.pass_rate) }}</div>{{ delta(s.pass_rate, b.pass_rate) }}</div>
+  <div class="card tile"><div class="label">Hallucination rate</div><div class="value">{{ pct(s.hallucination_rate) }}</div>{{ delta(s.hallucination_rate, b.hallucination_rate, False) }}</div>
+  <div class="card tile"><div class="label">Correct action</div><div class="value">{{ pct(s.action_accuracy) }}</div>{{ delta(s.action_accuracy, b.action_accuracy) }}</div>
+  <div class="card tile"><div class="label">Human handoff recall</div><div class="value">{{ pct(s.handoff_recall) }}</div>{{ delta(s.handoff_recall, b.handoff_recall) }}</div>
+  <div class="card tile"><div class="label">Retrieval hit rate</div><div class="value">{{ pct(s.retrieval_hit_rate) }}</div><div class="delta">right article in top 3</div></div>
+  <div class="card tile"><div class="label">Median latency</div><div class="value">{{ "%.1f"|format(s.latency_p50_s) }}s</div><div class="delta">p95 {{ "%.1f"|format(s.latency_p95_s) }}s</div></div>
+  <div class="card tile"><div class="label">Cost per conversation</div><div class="value">${{ "%.4f"|format(s.cost_per_conversation_usd) }}</div><div class="delta">bot only, excludes judge</div></div>
+  <div class="card tile"><div class="label">Policy violations</div><div class="value">{{ s.policy_violations }}</div><div class="delta">{{ b.policy_violations }} with prompt {{ baseline.prompt_version }}</div></div>
+</div>
+
+<h2>Pass rate by test category</h2>
+<p class="section-note">A conversation passes only if every deterministic check passes (correct action, required facts present, forbidden text absent, real citations) and the LLM judge rates it correct, grounded and policy-safe.</p>
+<div class="card">
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--s1)"></span>Prompt {{ current.prompt_version }} (hardened)</span>
+    <span><span class="swatch" style="background:var(--s2)"></span>Prompt {{ baseline.prompt_version }} (baseline)</span>
+  </div>
+  <div class="scroll">{{ category_chart|safe }}</div>
+  <details class="table-view"><summary>Show as table</summary>
+    <div class="scroll"><table>
+      <tr><th>Category</th><th class="num">Cases</th><th class="num">{{ baseline.prompt_version }} passed</th><th class="num">{{ current.prompt_version }} passed</th></tr>
+      {% for key, label in category_labels.items() if key in s.by_category %}
+      <tr><td>{{ label }}</td><td class="num">{{ s.by_category[key].total }}</td><td class="num">{{ b.by_category[key].passed }} ({{ pct(b.by_category[key].pass_rate) }})</td><td class="num">{{ s.by_category[key].passed }} ({{ pct(s.by_category[key].pass_rate) }})</td></tr>
+      {% endfor %}
+    </table></div>
+  </details>
+</div>
+
+<h2>What the bot did vs. what it should have done</h2>
+<p class="section-note">Rows are the ideal action for each test conversation; columns are what prompt {{ current.prompt_version }} actually chose. The outlined diagonal is correct. Some cases accept more than one action, so off-diagonal cells are not all failures.</p>
+<div class="card scroll">
+  <table class="cm">
+    <tr><th>Expected ↓ / Chosen →</th>{% for col in confusion.cols %}<th class="num">{{ col }}</th>{% endfor %}<th class="num">Total</th></tr>
+    {% for row in confusion.rows %}
+    <tr><th>{{ row.expected }}</th>
+      {% for cell in row.cells %}<td class="cell{% if cell.diag %} diag{% endif %} {{ 'dark-text' if cell.dark_text else 'light-text' }}"{% if cell.n %} style="background:{{ cell.bg }}"{% endif %}>{{ cell.n if cell.n else '' }}</td>{% endfor %}
+      <td class="num">{{ row.total }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<h2>Regression check: {{ baseline.prompt_version }} → {{ current.prompt_version }}</h2>
+<p class="section-note">Every conversation whose result changed between the two prompts. A prompt change that fixes some cases can quietly break others; this list is what a release review looks at.</p>
+<div class="two-col">
+  <div class="card"><h3>Fixed by {{ current.prompt_version }} <span class="badge pass">✓ {{ fixed|length }}</span></h3>
+    {% if fixed %}<table>{% for f in fixed %}<tr><td><code>{{ f.current.id }}</code></td><td>{{ category_labels[f.current.category] }}</td></tr>{% endfor %}</table>{% else %}<p class="meta">None.</p>{% endif %}
+  </div>
+  <div class="card"><h3>Broken by {{ current.prompt_version }} <span class="badge fail">✕ {{ regressed|length }}</span></h3>
+    {% if regressed %}<table>{% for f in regressed %}<tr><td><code>{{ f.current.id }}</code></td><td>{{ category_labels[f.current.category] }}</td></tr>{% endfor %}</table>{% else %}<p class="meta">None. No conversation that passed on {{ baseline.prompt_version }} fails on {{ current.prompt_version }}.</p>{% endif %}
+  </div>
+</div>
+
+{% macro case_card(c, version_class="") %}
+<div class="card case">
+  <div class="case-head"><span class="id">{{ c.id }}</span><span class="cat">{{ category_labels[c.category] }}</span>
+    {% if c.passed %}<span class="badge pass">✓ Pass</span>{% else %}<span class="badge fail">✕ Fail</span>{% endif %}</div>
+  {% for t in c.turns %}<div class="turn"><span class="who">{{ 'Customer' if t.role == 'user' else 'Bot (scripted earlier turn)' }}</span>{{ t.content }}</div>{% endfor %}
+  <div class="turn bot {{ version_class }}"><span class="who">Bot · action: {{ c.result.action }}{% if c.result.citations %} · cites {{ c.result.citations|join(', ') }}{% endif %}</span>{{ c.result.reply or '(no reply)' }}</div>
+  {% if c.failed_checks %}<ul class="findings">{% for f in c.failed_checks %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+  {% if c.judge %}<p class="ref"><strong>Judge:</strong> {{ c.judge.reason }}</p>{% endif %}
+  <p class="ref"><strong>Expected:</strong> {{ c.reference }}</p>
+</div>
+{% endmacro %}
+
+<h2>Failures with prompt {{ current.prompt_version }} ({{ current_failures|length }})</h2>
+<p class="section-note">Real transcripts from this run, with the checks that failed and the judge's reasoning.</p>
+{% for c in current_failures %}{{ case_card(c) }}{% else %}<p class="meta">No failures.</p>{% endfor %}
+
+<h2>Baseline failures that {{ current.prompt_version }} fixed</h2>
+<p class="section-note">The same conversations answered by the baseline prompt {{ baseline.prompt_version }}, to show the kind of mistake the hardened prompt prevents.</p>
+{% for f in fixed %}{{ case_card(f.baseline, "v1") }}{% else %}<p class="meta">None.</p>{% endfor %}
+
+<h2>Method</h2>
+<div class="card">
+<ul class="plain">
+  <li><strong>System under test.</strong> A retrieval-augmented assistant: BM25 retrieves the top 3 of 15 help center articles for each customer message, and <code>{{ current.bot_model }}</code> replies with structured output (<code>reply</code>, <code>action</code>, <code>citations</code>).</li>
+  <li><strong>Golden dataset.</strong> {{ s.total }} hand-written conversations across {{ s.by_category|length }} categories, each with acceptable actions, required and forbidden content, expected source articles and a reference answer.</li>
+  <li><strong>Deterministic checks.</strong> Action, required facts (exact strings or regex), forbidden content, citations that exist, and the expected article cited.</li>
+  <li><strong>LLM-as-judge.</strong> <code>{{ current.judge_model }}</code> scores correctness 1 to 5 against the reference, lists any claim about the product not supported by the articles the bot was given (hallucination), and flags policy violations. Pass = correctness ≥ 4, no unsupported claims, no violation.</li>
+  <li><strong>Judge calibration.</strong>
+    {% if calibration %}On {{ calibration.n }} hand-labeled conversations the judge agreed with the human label {{ pct(calibration.agreement) }} of the time (Cohen's κ = {{ "%.2f"|format(calibration.kappa) }}). It was stricter than the human on {{ calibration.judge_stricter }} and looser on {{ calibration.judge_looser }}.
+    {% else %}Pending: a stratified sample is being hand-labeled to measure how often the judge agrees with a human.{% endif %}</li>
+  <li><strong>Release gate.</strong> <code>pytest</code> fails the build if pass rate &lt; 85%, action accuracy &lt; 90%, any required handoff is missed, hallucination rate &gt; 5%, or any policy violation occurs.</li>
+  <li><strong>Limitations.</strong> {{ s.total }} cases is enough to catch regressions, not to estimate rates precisely (one case ≈ {{ "%.1f"|format(100 / s.total) }} points). The judge is a larger model from the same family as the bot (GPT-6.1), so shared blind spots are possible; the hand-labeled sample is the check on that. Each case ran once, so run-to-run variation isn't measured here.</li>
+</ul>
+<p class="meta">Total API cost for both runs including judging: ${{ "%.2f"|format(total_cost) }}.</p>
+</div>
+
+<footer>Built by Md Masud Rana · LLM evaluation &amp; AI QA. Source code, dataset and raw results: <a href="https://github.com/masudr4n4/llm-support-bot-evals">github.com/masudr4n4/llm-support-bot-evals</a>.</footer>
+</main>
+</body>
+</html>

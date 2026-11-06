@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"returns-portal\" title=\"Returns portal\" updated=\"2026-06-30\">\nThe returns portal lets your customers start a return and print a prepaid return label themselves. It is available on the Growth and Scale plans.\n\nYou choose who pays for return postage: the store, or the customer (deducted from their refund in your store platform).\n\nReturn labels are only charged when the carrier scans them. Unused return labels cost nothing.\n\nReturns can be limited to a window you set, from 7 to 90 days after delivery.\n</article>\n\n<article id=\"data-retention-privacy\" title=\"Data retention and privacy\" updated=\"2026-09-10\">\nShipment and order data is kept for 24 months, then deleted automatically. You can export your shipments as CSV at any time from Reports > Export.\n\nTo delete your account and all of its data, the account owner must ask a human agent. Deletion is completed within 30 days of the request and cannot be undone.\n\nA Data Processing Agreement (DPA) for GDPR is available on request for all plans.\n\nTidewell never sells your data or your customers' data.\n</article>\n\n<article id=\"supported-carriers\" title=\"Supported carriers\" updated=\"2026-07-10\">\nTidewell supports these carriers: USPS, UPS, FedEx, DHL Express and Canada Post.\n\nYou can use Tidewell's discounted rates, or connect your own carrier account (UPS, FedEx and DHL Express only) to use your negotiated rates.\n\nTidewell does not support Amazon Shipping, OnTrac or regional courier services at this time.\n\nCanada Post is available for shipments that start in Canada only.\n</article>\n</help_center_articles>\n\n<customer_message>\nDo I pay for return labels my customers never use?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "No. Return labels are only charged when the carrier scans them, so unused labels cost nothing.",
+    "action": "answer",
+    "citations": [
+      "returns-portal"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.5932492920001096,
+  "tokens": {
+    "input_tokens": 612,
+    "cached_input_tokens": 0,
+    "output_tokens": 42,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.000822,
+  "response_id": "resp_01bc47ddfa0d8cfa016aed720bd5ac87d29154800a6df1cfd4",
+  "created_at": "2026-11-06T06:22:05+00:00"
+}

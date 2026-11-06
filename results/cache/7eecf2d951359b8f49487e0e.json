@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"international-customs\" title=\"International shipping and customs\" updated=\"2026-06-12\">\nTidewell fills in customs forms (CN22 or CN23) automatically for international USPS shipments, using the product details from your store.\n\nAdd an HS tariff code to each product to avoid delays. Shipments without HS codes may be held by customs.\n\nDelivered Duty Paid (DDP), where you prepay duties and taxes for your customer, is available with DHL Express only.\n\nTidewell cannot ship lithium batteries, aerosols or perfume internationally.\n</article>\n\n<article id=\"supported-carriers\" title=\"Supported carriers\" updated=\"2026-07-10\">\nTidewell supports these carriers: USPS, UPS, FedEx, DHL Express and Canada Post.\n\nYou can use Tidewell's discounted rates, or connect your own carrier account (UPS, FedEx and DHL Express only) to use your negotiated rates.\n\nTidewell does not support Amazon Shipping, OnTrac or regional courier services at this time.\n\nCanada Post is available for shipments that start in Canada only.\n</article>\n\n<article id=\"lost-or-damaged-packages\" title=\"Lost or damaged packages\" updated=\"2026-07-01\">\nCarriers are responsible for packages in transit. Without Shipping Protection, claims for lost or damaged packages must be filed directly with the carrier.\n\nShipping Protection is an optional add-on that costs $1.25 per $100 of declared value, with a minimum of $1.25 per package. It covers up to $5,000 per package.\n\nShipping Protection claims must be filed within 30 days of the ship date from Shipments > File a claim. A package is considered lost if it has no tracking updates for 10 days (domestic) or 20 days (international).\n\nApproved claims are paid within 7 business days to your original payment method.\n</article>\n</help_center_articles>\n\n<customer_message>\nCan I ship with Amazon Shipping through Tidewell?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "No, Tidewell does not currently support Amazon Shipping.",
+    "action": "answer",
+    "citations": [
+      "supported-carriers"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.64617404099954,
+  "tokens": {
+    "input_tokens": 649,
+    "cached_input_tokens": 0,
+    "output_tokens": 34,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.000819,
+  "response_id": "resp_041b7e40e480fecb016aed720729f487d2a116eac0cb80d4dd",
+  "created_at": "2026-11-06T06:22:00+00:00"
+}

@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"plans-and-pricing\" title=\"Plans and pricing\" updated=\"2026-09-01\">\nTidewell has three plans. Prices are in USD and billed monthly unless you choose annual billing.\n\n- Starter: $19/month. Includes 300 shipments per month and 1 user seat.\n- Growth: $59/month. Includes 2,000 shipments per month and 5 user seats.\n- Scale: $199/month. Includes 10,000 shipments per month and unlimited user seats.\n\nOverage: shipments above your plan's monthly allowance cost $0.05 each on Starter, $0.03 each on Growth and $0.02 each on Scale. Overage is billed on your next invoice.\n\nAnnual billing: paying yearly gives you 2 months free (you pay for 10 months).\n\nYou can upgrade at any time and the change takes effect immediately; you are charged a prorated amount for the rest of the billing period. Downgrades take effect at the start of your next billing period.\n\nUnused shipments do not roll over to the next month.\n</article>\n\n<article id=\"api-and-webhooks\" title=\"API and webhooks\" updated=\"2026-08-28\">\nThe Tidewell REST API is available on the Growth and Scale plans. Create API keys in Settings > Developers.\n\nRate limits: 120 requests per minute on Growth, 600 requests per minute on Scale. Requests over the limit get an HTTP 429 response.\n\nWebhooks can notify your system about label created, tracking updated and delivered events. If your endpoint does not return a 2xx response, Tidewell retries up to 5 times over 24 hours.\n\nA sandbox environment for testing is available to all API users; sandbox labels are free and not valid for shipping.\n</article>\n\n<article id=\"legacy-plans\" title=\"Legacy plans\" updated=\"2026-01-20\">\nThe Basic plan ($9/month, 100 shipments) was discontinued on January 15, 2026. It is no longer available to new customers.\n\nCustomers who were on Basic before that date keep their price for as long as they stay on the plan. If a Basic customer switches to another plan, they cannot switch back to Basic.\n</article>\n</help_center_articles>\n\n<customer_message>\nDo my unused shipments carry over to next month?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "No, unused shipments don\u2019t carry over to the next month.",
+    "action": "answer",
+    "citations": [
+      "plans-and-pricing"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.9794851250007923,
+  "tokens": {
+    "input_tokens": 721,
+    "cached_input_tokens": 0,
+    "output_tokens": 37,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.000906,
+  "response_id": "resp_0521566e563bb15d016aed720271b487d2bdfa1de3533e48c2",
+  "created_at": "2026-11-06T06:21:56+00:00"
+}

@@ -1,0 +1,66 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"tracking-notifications\" title=\"Tracking and customer notifications\" updated=\"2026-08-05\">\nTidewell sends tracking emails to your customers when a label is created, when the package is out for delivery and when it is delivered.\n\nSMS tracking notifications are available on the Growth and Scale plans. Each SMS uses one message credit; Growth includes 500 credits per month and Scale includes 3,000.\n\nA branded tracking page with your logo and colors is available on the Scale plan only.\n\nTracking updates are pulled from carriers about every 2 hours.\n</article>\n\n<article id=\"api-and-webhooks\" title=\"API and webhooks\" updated=\"2026-08-28\">\nThe Tidewell REST API is available on the Growth and Scale plans. Create API keys in Settings > Developers.\n\nRate limits: 120 requests per minute on Growth, 600 requests per minute on Scale. Requests over the limit get an HTTP 429 response.\n\nWebhooks can notify your system about label created, tracking updated and delivered events. If your endpoint does not return a 2xx response, Tidewell retries up to 5 times over 24 hours.\n\nA sandbox environment for testing is available to all API users; sandbox labels are free and not valid for shipping.\n</article>\n</help_center_articles>\n\n<customer_message>\nWrite me a poem about the ocean.\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "I\u2019m here to help with Tidewell shipping questions. Is there anything I can help you with?",
+    "action": "refuse",
+    "citations": []
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.916092875000686,
+  "tokens": {
+    "input_tokens": 521,
+    "cached_input_tokens": 0,
+    "output_tokens": 56,
+    "reasoning_tokens": 13
+  },
+  "cost_usd": 0.000801,
+  "response_id": "resp_0f009db43f3f6248016aed722095dc87d29f0fdcdd88307ab4",
+  "created_at": "2026-11-06T06:22:26+00:00"
+}

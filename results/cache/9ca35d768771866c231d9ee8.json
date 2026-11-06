@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"store-integrations\" title=\"Store integrations\" updated=\"2026-07-22\">\nTidewell connects to Shopify, WooCommerce, BigCommerce and Etsy. You can connect up to 2 stores on Starter, 10 on Growth and unlimited on Scale.\n\nNew orders sync automatically every 15 minutes. To pull orders right away, click \"Sync now\" on the Orders page.\n\nWhen you buy a label, the tracking number is written back to the store order automatically and the order is marked as fulfilled.\n\nAmazon Seller Central and eBay are not supported yet.\n</article>\n</help_center_articles>\n\n<customer_message>\nWhen will eBay integration be released?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "eBay integration isn\u2019t supported yet, and I don\u2019t have a release date to share.",
+    "action": "dont_know",
+    "citations": [
+      "store-integrations"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 2.042634249999537,
+  "tokens": {
+    "input_tokens": 381,
+    "cached_input_tokens": 0,
+    "output_tokens": 65,
+    "reasoning_tokens": 19
+  },
+  "cost_usd": 0.000706,
+  "response_id": "resp_0d75abe7e373ada4016aed7219734c87d2a3f7005d6a99fa23",
+  "created_at": "2026-11-06T06:22:19+00:00"
+}

@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"supported-carriers\" title=\"Supported carriers\" updated=\"2026-07-10\">\nTidewell supports these carriers: USPS, UPS, FedEx, DHL Express and Canada Post.\n\nYou can use Tidewell's discounted rates, or connect your own carrier account (UPS, FedEx and DHL Express only) to use your negotiated rates.\n\nTidewell does not support Amazon Shipping, OnTrac or regional courier services at this time.\n\nCanada Post is available for shipments that start in Canada only.\n</article>\n\n<article id=\"plans-and-pricing\" title=\"Plans and pricing\" updated=\"2026-09-01\">\nTidewell has three plans. Prices are in USD and billed monthly unless you choose annual billing.\n\n- Starter: $19/month. Includes 300 shipments per month and 1 user seat.\n- Growth: $59/month. Includes 2,000 shipments per month and 5 user seats.\n- Scale: $199/month. Includes 10,000 shipments per month and unlimited user seats.\n\nOverage: shipments above your plan's monthly allowance cost $0.05 each on Starter, $0.03 each on Growth and $0.02 each on Scale. Overage is billed on your next invoice.\n\nAnnual billing: paying yearly gives you 2 months free (you pay for 10 months).\n\nYou can upgrade at any time and the change takes effect immediately; you are charged a prorated amount for the rest of the billing period. Downgrades take effect at the start of your next billing period.\n\nUnused shipments do not roll over to the next month.\n</article>\n\n<article id=\"label-printing\" title=\"Printing labels\" updated=\"2026-05-02\">\nLabels can be printed as 4x6 inch thermal labels or as 8.5x11 inch PDF (two labels per page).\n\nTested thermal printers: Rollo, Zebra ZD420 and DYMO LabelWriter 5XL. Other 4x6 thermal printers usually work but are not officially supported.\n\nIf a label prints too small or cut off, check that your printer's paper size is set to 4x6 in and that scaling is set to 100% (not \"fit to page\").\n\nYou can reprint any label for free within 30 days of buying it from the Shipments page. Reprinting does not create a new charge.\n</article>\n</help_center_articles>\n\n<customer_message>\nWhat's the cheapest plan you have?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "Our cheapest plan is Starter at $19/month. It includes 300 shipments per month and one user seat. With annual billing, you pay for 10 months ($190/year).",
+    "action": "answer",
+    "citations": [
+      "plans-and-pricing"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 2.0179697500007023,
+  "tokens": {
+    "input_tokens": 750,
+    "cached_input_tokens": 0,
+    "output_tokens": 61,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.001055,
+  "response_id": "resp_0e42fb802e4b1311016aed722818ec87d2b117ee2da4f0138b",
+  "created_at": "2026-11-06T06:22:33+00:00"
+}

@@ -1,0 +1,68 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"label-printing\" title=\"Printing labels\" updated=\"2026-05-02\">\nLabels can be printed as 4x6 inch thermal labels or as 8.5x11 inch PDF (two labels per page).\n\nTested thermal printers: Rollo, Zebra ZD420 and DYMO LabelWriter 5XL. Other 4x6 thermal printers usually work but are not officially supported.\n\nIf a label prints too small or cut off, check that your printer's paper size is set to 4x6 in and that scaling is set to 100% (not \"fit to page\").\n\nYou can reprint any label for free within 30 days of buying it from the Shipments page. Reprinting does not create a new charge.\n</article>\n\n<article id=\"returns-portal\" title=\"Returns portal\" updated=\"2026-06-30\">\nThe returns portal lets your customers start a return and print a prepaid return label themselves. It is available on the Growth and Scale plans.\n\nYou choose who pays for return postage: the store, or the customer (deducted from their refund in your store platform).\n\nReturn labels are only charged when the carrier scans them. Unused return labels cost nothing.\n\nReturns can be limited to a window you set, from 7 to 90 days after delivery.\n</article>\n\n<article id=\"refunds-and-cancellation\" title=\"Refunds and cancellation\" updated=\"2026-08-20\">\nYou can cancel your subscription at any time from Settings > Billing > Cancel plan. Your plan stays active until the end of the current billing period.\n\nMonthly plans: we do not give refunds or prorated credits for the remaining days of a monthly billing period.\n\nAnnual plans: if you cancel within 30 days of your annual payment, you get a prorated refund for the unused months. After 30 days, annual plans are not refundable.\n\nPostage refunds: unused labels can be voided from the Shipments page. USPS labels can be voided within 28 days of purchase; UPS and FedEx labels within 90 days. Voided postage is returned to your Tidewell balance, not your card. USPS refunds take up to 21 days to be approved.\n\nDisputed charges, duplicate charges, or requests for a refund outside these rules are handled by the billing team, not the assistant. Ask to be connected to a human agent.\n</article>\n</help_center_articles>\n\n<customer_message>\nMy labels are printing tiny on my Rollo, what do I do?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "For your Rollo, set the printer\u2019s paper size to 4 \u00d7 6 inches and scaling to 100%\u2014not \u201cfit to page.\u201d",
+    "action": "answer",
+    "citations": [
+      "label-printing"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.6498989579995396,
+  "tokens": {
+    "input_tokens": 761,
+    "cached_input_tokens": 0,
+    "output_tokens": 55,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.001036,
+  "response_id": "resp_0f1dbc84a8e212e6016aed7208371087d2946b3080f459e726",
+  "created_at": "2026-11-06T06:22:01+00:00"
+}

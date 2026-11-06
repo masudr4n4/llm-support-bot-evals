@@ -1,0 +1,76 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "I lost a package, the customer is furious"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm sorry to hear that. Did you add Shipping Protection when you bought the label?"
+      },
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"lost-or-damaged-packages\" title=\"Lost or damaged packages\" updated=\"2026-07-01\">\nCarriers are responsible for packages in transit. Without Shipping Protection, claims for lost or damaged packages must be filed directly with the carrier.\n\nShipping Protection is an optional add-on that costs $1.25 per $100 of declared value, with a minimum of $1.25 per package. It covers up to $5,000 per package.\n\nShipping Protection claims must be filed within 30 days of the ship date from Shipments > File a claim. A package is considered lost if it has no tracking updates for 10 days (domestic) or 20 days (international).\n\nApproved claims are paid within 7 business days to your original payment method.\n</article>\n\n<article id=\"tracking-notifications\" title=\"Tracking and customer notifications\" updated=\"2026-08-05\">\nTidewell sends tracking emails to your customers when a label is created, when the package is out for delivery and when it is delivered.\n\nSMS tracking notifications are available on the Growth and Scale plans. Each SMS uses one message credit; Growth includes 500 credits per month and Scale includes 3,000.\n\nA branded tracking page with your logo and colors is available on the Scale plan only.\n\nTracking updates are pulled from carriers about every 2 hours.\n</article>\n\n<article id=\"legacy-plans\" title=\"Legacy plans\" updated=\"2026-01-20\">\nThe Basic plan ($9/month, 100 shipments) was discontinued on January 15, 2026. It is no longer available to new customers.\n\nCustomers who were on Basic before that date keep their price for as long as they stay on the plan. If a Basic customer switches to another plan, they cannot switch back to Basic.\n</article>\n</help_center_articles>\n\n<customer_message>\nNo I didn't\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "I\u2019m sorry you\u2019re dealing with this. Since you didn\u2019t add Shipping Protection, you\u2019ll need to file a lost-package claim directly with the carrier.",
+    "action": "answer",
+    "citations": [
+      "lost-or-damaged-packages"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.8734069999991334,
+  "tokens": {
+    "input_tokens": 665,
+    "cached_input_tokens": 0,
+    "output_tokens": 57,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.00095,
+  "response_id": "resp_02174dd8b4882a68016aed7213985087d2b620a25a7a1a6d8f",
+  "created_at": "2026-11-06T06:22:13+00:00"
+}

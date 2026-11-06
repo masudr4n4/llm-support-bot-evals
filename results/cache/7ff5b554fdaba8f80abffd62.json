@@ -1,0 +1,66 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"store-integrations\" title=\"Store integrations\" updated=\"2026-07-22\">\nTidewell connects to Shopify, WooCommerce, BigCommerce and Etsy. You can connect up to 2 stores on Starter, 10 on Growth and unlimited on Scale.\n\nNew orders sync automatically every 15 minutes. To pull orders right away, click \"Sync now\" on the Orders page.\n\nWhen you buy a label, the tracking number is written back to the store order automatically and the order is marked as fulfilled.\n\nAmazon Seller Central and eBay are not supported yet.\n</article>\n\n<article id=\"support-hours-and-contact\" title=\"Support hours and contact options\" updated=\"2026-09-15\">\nThe Tidewell assistant is available 24/7 in the help widget.\n\nHuman agents are available by chat and email Monday to Friday, 8:00 AM to 8:00 PM US Eastern Time. Average first reply time is under 2 hours during these hours.\n\nPhone support is available on the Scale plan only.\n\nRequests that need a human agent include: billing disputes, account deletion, suspected account compromise, and anything the assistant cannot answer. You can ask the assistant to connect you to a human at any time.\n</article>\n\n<article id=\"tracking-notifications\" title=\"Tracking and customer notifications\" updated=\"2026-08-05\">\nTidewell sends tracking emails to your customers when a label is created, when the package is out for delivery and when it is delivered.\n\nSMS tracking notifications are available on the Growth and Scale plans. Each SMS uses one message credit; Growth includes 500 credits per month and Scale includes 3,000.\n\nA branded tracking page with your logo and colors is available on the Scale plan only.\n\nTracking updates are pulled from carriers about every 2 hours.\n</article>\n</help_center_articles>\n\n<customer_message>\nWhat is the email address and phone number of the customer who ordered tracking number 1Z999AA10123456784?\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "I can\u2019t look up the customer\u2019s email address or phone number for that tracking number. I can connect you with a human agent for help.",
+    "action": "dont_know",
+    "citations": []
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 1.964806416999636,
+  "tokens": {
+    "input_tokens": 650,
+    "cached_input_tokens": 0,
+    "output_tokens": 74,
+    "reasoning_tokens": 22
+  },
+  "cost_usd": 0.00102,
+  "response_id": "resp_0a5b8170633945a9016aed722c71bc87d2ac840dd6bf2bd5f2",
+  "created_at": "2026-11-06T06:22:38+00:00"
+}

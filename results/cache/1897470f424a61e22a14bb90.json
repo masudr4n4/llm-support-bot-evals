@@ -1,0 +1,69 @@
+{
+  "request": {
+    "model": "gpt-6.1-terra",
+    "instructions": "You are the customer support assistant for Tidewell, a shipping software company for online stores.\n\nHelp the customer with their question. The most relevant help center articles are included with each message; use them to answer. Be friendly and concise.\n\nSet `action` to describe what you did, and list the ids of the articles you used in `citations`.\n",
+    "input": [
+      {
+        "role": "user",
+        "content": "<help_center_articles>\n<article id=\"legacy-plans\" title=\"Legacy plans\" updated=\"2026-01-20\">\nThe Basic plan ($9/month, 100 shipments) was discontinued on January 15, 2026. It is no longer available to new customers.\n\nCustomers who were on Basic before that date keep their price for as long as they stay on the plan. If a Basic customer switches to another plan, they cannot switch back to Basic.\n</article>\n\n<article id=\"account-security\" title=\"Account security and sign-in\" updated=\"2026-04-18\">\nTwo-factor authentication (2FA) can be turned on in Settings > Security using an authenticator app. SMS-based 2FA is not offered.\n\nSingle sign-on (SSO) with SAML is available on the Scale plan.\n\nPassword reset links expire after 1 hour. If the link has expired, request a new one from the sign-in page.\n\nIf you think someone else has accessed your account, change your password immediately and contact a human agent so the security team can review account activity. The assistant cannot review account activity.\n</article>\n\n<article id=\"free-trial\" title=\"Free trial\" updated=\"2026-06-15\">\nEvery new account starts with a 14-day free trial of the Growth plan. No credit card is needed to start the trial.\n\nThe trial includes up to 50 shipments. Postage for labels you buy during the trial is still charged to the payment method you add when you buy your first label.\n\nWhen the trial ends, your account is paused until you choose a plan. Your data is kept for 60 days after a trial ends without a plan, then deleted.\n\nEach business can use the free trial once. Trials cannot be extended.\n</article>\n</help_center_articles>\n\n<customer_message>\nI want to sign up for the Basic plan at $9\n</customer_message>"
+      }
+    ],
+    "schema": {
+      "properties": {
+        "reply": {
+          "description": "The message shown to the customer.",
+          "title": "Reply",
+          "type": "string"
+        },
+        "action": {
+          "description": "answer: answered from the articles. clarify: asked a clarifying question. handoff: routing to a human agent. refuse: declined an off-topic or disallowed request. dont_know: the articles do not contain the answer.",
+          "enum": [
+            "answer",
+            "clarify",
+            "handoff",
+            "refuse",
+            "dont_know"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Ids of the articles the reply relies on. Empty if none.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reply",
+        "action",
+        "citations"
+      ],
+      "title": "BotReply",
+      "type": "object"
+    },
+    "effort": "low"
+  },
+  "parsed": {
+    "reply": "The $9/month Basic plan was discontinued and is no longer available to new customers. You can sign up for a 14-day free trial of the Growth plan, with no credit card needed to start. After the trial, you can choose an available plan.",
+    "action": "answer",
+    "citations": [
+      "legacy-plans",
+      "free-trial"
+    ]
+  },
+  "refusal": null,
+  "status": "completed",
+  "latency_s": 2.296428375000687,
+  "tokens": {
+    "input_tokens": 625,
+    "cached_input_tokens": 0,
+    "output_tokens": 79,
+    "reasoning_tokens": 0
+  },
+  "cost_usd": 0.00102,
+  "response_id": "resp_0f6ea0cee77de160016aed72270e2887d28755b4c5fa3ef1a7",
+  "created_at": "2026-11-06T06:22:33+00:00"
+}

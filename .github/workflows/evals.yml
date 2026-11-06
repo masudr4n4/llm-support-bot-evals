@@ -1,0 +1,45 @@
+name: evals
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_evals:
+        description: "Run the full LLM eval (uses the OPENAI_API_KEY secret, costs a few dollars)"
+        type: boolean
+        default: false
+
+jobs:
+  offline:
+    name: Unit tests, dataset and retrieval checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run pytest -q
+
+  llm-eval:
+    name: LLM eval and release gate
+    if: github.event_name == 'workflow_dispatch' && inputs.run_evals
+    needs: offline
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run python -m support_bot_evals.run --prompt v1
+      - run: uv run python -m support_bot_evals.run --prompt v2
+      - run: uv run python -m support_bot_evals.report
+      - name: Release gate
+        run: uv run pytest -q tests/test_release_gate.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: |
+            results/
+            docs/index.html
