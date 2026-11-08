@@ -36,8 +36,6 @@ CACHE_DIR = ROOT / "results" / "cache"
 PRICES = {
     "gpt-6.1-sol": (2.00, 0.10, 10.00),
     "gpt-6.1-terra": (1.00, 0.05, 5.00),
-    "gpt-6-luna": (0.10, 0.01, 0.50),
-    "gpt-5.5": (5.00, 0.50, 30.00),
 }
 
 _lock = threading.Lock()

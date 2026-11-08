@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import hashlib
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -92,7 +93,8 @@ def main() -> None:
             f"Stopped early: {len(cases) - len(records)} cases skipped by the spend cap. Every response so far is "
             "saved; raise MAX_RUN_COST_USD and run the same command again to continue without paying twice."
         )
-        return
+        # Fail loudly so CI can't go on to gate the old committed results.
+        sys.exit(1)
 
     output = {
         "prompt_version": args.prompt,

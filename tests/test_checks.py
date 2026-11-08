@@ -16,7 +16,7 @@ KNOWN = {"plans-and-pricing", "free-trial"}
 
 
 def result(reply="Growth is $59/month with 2,000 shipments.", action="answer", citations=("plans-and-pricing",)):
-    return BotResult(reply, action, list(citations), ["plans-and-pricing"], 1.0, "end_turn")
+    return BotResult(reply, action, list(citations), ["plans-and-pricing"], 1.0, "completed")
 
 
 def test_matches_substring_and_regex():

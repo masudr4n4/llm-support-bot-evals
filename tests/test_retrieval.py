@@ -1,4 +1,7 @@
-"""Offline retrieval quality: the right article should be in the top 3 for every answerable case."""
+"""Offline retrieval quality: the right article should be in the top 3 for at least 90% of answerable cases.
+
+Known misses: fact-10 (a tokenizer bug, see README "Known issues") and adv-06 (injected text dilutes the query).
+"""
 
 from support_bot_evals.bot import SupportBot
 from support_bot_evals.dataset import load_cases

@@ -6,13 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       run_evals:
-        description: "Run the full LLM eval (uses the OPENAI_API_KEY secret, costs a few dollars)"
+        description: "Run the full LLM eval (uses the OPENAI_API_KEY secret; replays the committed response cache for free, about $0.60 if results/cache is cleared)"
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 jobs:
   offline:
-    name: Unit tests, dataset and retrieval checks
+    name: Unit tests, dataset checks and release gate on committed results
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

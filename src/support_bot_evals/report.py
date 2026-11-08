@@ -10,7 +10,7 @@ from html import escape
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .kb import ROOT
+from .kb import ROOT, load_articles
 from .label import LABELS
 from .metrics import ACTIONS
 
@@ -41,7 +41,7 @@ def category_chart(baseline: dict, current: dict) -> str:
     width, height = label_w + plot_w + right, 28 + row_h * len(cats)
     x = lambda v: label_w + v * plot_w  # noqa: E731
 
-    parts = [f'<svg viewBox="0 0 {width} {height}" role="img" aria-labelledby="cat-title" class="chart">']
+    parts = [f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="Pass rate by test category, baseline vs hardened prompt" class="chart">']
     for tick in (0, 0.5, 1):
         parts.append(f'<line x1="{x(tick)}" x2="{x(tick)}" y1="18" y2="{height}" class="grid"/>')
         parts.append(f'<text x="{x(tick)}" y="12" class="tick" text-anchor="middle">{tick:.0%}</text>')
@@ -167,6 +167,7 @@ def main() -> None:
         regressed=regressed,
         current_failures=[c for c in current["cases"] if not c["passed"]],
         baseline_failures=[c for c in baseline["cases"] if not c["passed"]],
+        n_articles=len(load_articles()),
         total_cost=sum(r[k]["cost_usd"] for r in (baseline, current) for k in ("bot_usage", "judge_usage")),
     )
     OUT.parent.mkdir(exist_ok=True)

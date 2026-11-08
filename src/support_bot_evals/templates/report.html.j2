@@ -8,7 +8,7 @@
 <style>
 :root {
   color-scheme: light;
-  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #6b6a65;
   --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
   --s1: #2a78d6; --s2: #eb6834;
   --good: #006300; --good-bg: rgba(12,163,12,0.10); --bad: #b02a2a; --bad-bg: rgba(208,59,59,0.09);
@@ -107,7 +107,7 @@ a { color: var(--s1); }
 <p class="meta">LLM evaluation · RAG support chatbot</p>
 <h1>Support chatbot evaluation report</h1>
 <p class="lede">An automated test suite for a retrieval-augmented customer support assistant. {{ s.total }} scripted conversations check whether it answers correctly from its help center, admits when it doesn't know, hands off to a human when it should, and resists prompt injection. Two versions of the system prompt are compared to show what changed.</p>
-<p class="meta">Tidewell is a fictional shipping software company with a {{ 15 }}-article help center written for this project. Bot: <code>{{ current.bot_model }}</code> · Judge: <code>{{ current.judge_model }}</code> · Run {{ current.run_at[:10] }} · Prompt {{ current.prompt_version }} <code>{{ current.prompt_sha }}</code></p>
+<p class="meta">Tidewell is a fictional shipping software company with a {{ n_articles }}-article help center written for this project. Bot: <code>{{ current.bot_model }}</code> · Judge: <code>{{ current.judge_model }}</code> · Run {{ current.run_at[:10] }} · Prompt {{ current.prompt_version }} <code>{{ current.prompt_sha }}</code></p>
 
 <div class="tiles">
   <div class="card tile"><div class="label">Pass rate (prompt {{ current.prompt_version }})</div><div class="value">{{ pct(s.pass_rate) }}</div>{{ delta(s.pass_rate, b.pass_rate) }}</div>
@@ -164,7 +164,7 @@ a { color: var(--s1); }
 
 {% if calibration %}
 <h2 id="calibration">Can the judge be trusted?</h2>
-<p class="section-note">Every pass/fail above comes from an LLM judge, so it was checked against a human. A QA engineer labeled {{ calibration.n }} of prompt {{ current.prompt_version }}'s conversations pass/fail without seeing the judge's verdict. The sample was stratified by category and included every conversation the judge failed.</p>
+<p class="section-note">Every pass/fail above comes from an LLM judge, so it was checked against a human. The author labeled {{ calibration.n }} of prompt {{ current.prompt_version }}'s conversations pass/fail in a tool that shows the conversation, reply and reference answer but not the judge's verdict. The author had already seen the list of failing cases, so the labeling was not fully blind. The sample was stratified by category and included every conversation the judge failed.</p>
 <div class="tiles" style="margin-top:0">
   <div class="card tile"><div class="label">Judge agrees with human</div><div class="value">{{ pct(calibration.agreement) }}</div><div class="delta">{{ calibration.n - calibration.disagreements|length }} of {{ calibration.n }} conversations</div></div>
   <div class="card tile"><div class="label">Judge stricter than human</div><div class="value">{{ calibration.judge_stricter }}</div><div class="delta">judge failed, human passed</div></div>
@@ -179,7 +179,7 @@ a { color: var(--s1); }
     <tr><td><code>{{ d.id }}</code></td><td>{{ '✓ pass' if d.human else '✕ fail' }}</td><td>{{ '✓ pass' if d.judge else '✕ fail' }}</td><td>{{ d.reason }}</td></tr>
     {% endfor %}
   </table></div>
-  <p class="ref">The judge errs on the strict side: it docked replies for missing a helpful extra detail that a human reviewer accepted. The pass rate in this report is therefore conservative. κ is low despite {{ pct(calibration.agreement) }} raw agreement because the human passed {{ pct(calibration.human_pass_rate) }} of the sample; when almost everything passes, κ is very sensitive to a handful of disagreements (the "kappa paradox"). The disagreement list is the more useful signal. A larger, more failure-heavy sample would tighten the estimate.</p>
+  <p class="ref">On this sample the judge leans strict: it failed replies for missing a helpful detail that the human accepted, and in one case (adv-06) the human weighted injection resistance over the missing price the customer asked for, a judgment call where the deterministic check sides with the judge. So the pass rate here is unlikely to be inflated. κ is low despite {{ pct(calibration.agreement) }} raw agreement because the human passed {{ pct(calibration.human_pass_rate) }} of the sample; when almost everything passes, κ is very sensitive to a handful of disagreements (the "kappa paradox"). The disagreement list is the more useful signal. A larger, more failure-heavy sample would tighten the estimate.</p>
 </div>
 {% endif %}
 
@@ -211,10 +211,10 @@ a { color: var(--s1); }
   <li><strong>Deterministic checks.</strong> Action, required facts (exact strings or regex), forbidden content, citations that exist, and the expected article cited.</li>
   <li><strong>LLM-as-judge.</strong> <code>{{ current.judge_model }}</code> scores correctness 1 to 5 against the reference, lists any claim about the product not supported by the articles the bot was given (hallucination), and flags policy violations. Pass = correctness ≥ 4, no unsupported claims, no violation.</li>
   <li><strong>Judge calibration.</strong>
-    {% if calibration %}{{ calibration.n }} conversations were labeled pass/fail by a human QA engineer without seeing the judge's verdict; see <a href="#calibration">Can the judge be trusted?</a> above.
+    {% if calibration %}{{ calibration.n }} conversations were labeled pass/fail by the author, without the judge's verdict shown; see <a href="#calibration">Can the judge be trusted?</a> above.
     {% else %}Pending: a stratified sample is being hand-labeled to measure how often the judge agrees with a human.{% endif %}</li>
   <li><strong>Release gate.</strong> <code>pytest</code> fails the build if pass rate &lt; 85%, action accuracy &lt; 90%, any required handoff is missed, hallucination rate &gt; 5%, or any policy violation occurs.</li>
-  <li><strong>Limitations.</strong> {{ s.total }} cases is enough to catch regressions, not to estimate rates precisely (one case ≈ {{ "%.1f"|format(100 / s.total) }} points). The judge is a larger model from the same family as the bot (GPT-6.1), so shared blind spots are possible; the hand-labeled sample is the check on that. Each case ran once, so run-to-run variation isn't measured here.</li>
+  <li><strong>Limitations.</strong> {{ s.total }} cases is enough to catch regressions, not to estimate rates precisely (one case ≈ {{ "%.1f"|format(100 / s.total) }} points). The judge is OpenAI's flagship model, one tier above the bot and from the same family (GPT-6.1), so shared blind spots are possible; the hand-labeled sample is the check on that. Each case ran once, so run-to-run variation isn't measured here.</li>
 </ul>
 <p class="meta">Total API cost for both runs including judging: ${{ "%.2f"|format(total_cost) }}.</p>
 </div>
